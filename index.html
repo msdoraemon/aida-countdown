@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wedding Countdown</title>
+  <style>
+    :root { --fg:#222; --muted:#666; --accent:#8b5cf6; }
+    html,body{height:100%;margin:0;background:transparent;}
+    body{
+      display:grid;place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--fg);
+    }
+    .box{
+      display:flex; gap:14px; align-items:stretch;
+      padding:10px 12px; border-radius:16px;
+      box-shadow:0 8px 24px rgba(0,0,0,.06);
+      background:rgba(255,255,255,.6); /* tukar ke transparent kalau nak */
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    }
+    .cell{
+      min-width:70px; text-align:center; padding:12px 10px; border-radius:14px;
+      border:1px solid rgba(0,0,0,.06);
+    }
+    .num{ font-size:28px; font-weight:800; line-height:1; letter-spacing:.5px; }
+    .label{ font-size:11px; text-transform:uppercase; color:var(--muted); letter-spacing:.12em; margin-top:6px; }
+    .dot{ width:6px; height:6px; border-radius:999px; background:var(--accent); display:inline-block; margin:0 2px; vertical-align:middle; }
+    .title{ position:absolute; top:10px; left:14px; font-size:12px; color:var(--muted); }
+    @media (max-width:420px){ .num{font-size:22px} .cell{min-width:58px} }
+  </style>
+</head>
+<body>
+  <div class="title">Majlis Aida & Pasangan</div>
+  <div class="box" role="timer" aria-live="polite">
+    <div class="cell"><div id="d" class="num">—</div><div class="label">Hari</div></div>
+    <div class="cell"><div id="h" class="num">—</div><div class="label">Jam</div></div>
+    <div class="cell"><div id="m" class="num">—</div><div class="label">Minit</div></div>
+    <div class="cell"><div id="s" class="num">—</div><div class="label">Saat</div></div>
+  </div>
+
+  <script>
+    // Tetapkan tarikh majlis — masa Malaysia (UTC+8)
+    const targetDate = new Date("2026-05-31T10:00:00+08:00").getTime();
+
+    const el = {
+      d: document.getElementById("d"),
+      h: document.getElementById("h"),
+      m: document.getElementById("m"),
+      s: document.getElementById("s"),
+    };
+
+    function pad(n){ return String(n).padStart(2,"0"); }
+
+    function tick(){
+      const now = Date.now();
+      let diff = Math.max(0, targetDate - now);
+
+      const days  = Math.floor(diff / (1000*60*60*24));
+      diff       -= days * (1000*60*60*24);
+      const hours = Math.floor(diff / (1000*60*60));
+      diff       -= hours * (1000*60*60);
+      const mins  = Math.floor(diff / (1000*60));
+      diff       -= mins * (1000*60);
+      const secs  = Math.floor(diff / 1000);
+
+      el.d.textContent = days;
+      el.h.textContent = pad(hours);
+      el.m.textContent = pad(mins);
+      el.s.textContent = pad(secs);
+
+      if (targetDate - now <= 0) {
+        document.querySelector(".box").innerHTML =
+          '<div class="cell" style="min-width:280px"><div class="num">Hari Ini! 🎉</div><div class="label">Selamat Menyambut Majlis</div></div>';
+        clearInterval(timer);
+      }
+    }
+
+    const timer = setInterval(tick, 1000);
+    tick();
+  </script>
+</body>
+</html>
